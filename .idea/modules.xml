@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidProjectClone.iml" filepath="$PROJECT_DIR$/AndroidProjectClone.iml" />
       <module fileurl="file://$PROJECT_DIR$/AndroidProjectNew.iml" filepath="$PROJECT_DIR$/AndroidProjectNew.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AndroidProjectnew.iml" filepath="$PROJECT_DIR$/AndroidProjectnew.iml" />
       <module fileurl="file://$PROJECT_DIR$/MyApplication.iml" filepath="$PROJECT_DIR$/MyApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

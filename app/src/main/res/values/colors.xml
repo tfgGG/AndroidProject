@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#F38181</color> //橘紅色
-    <color name="colorPrimaryDark">#FCE38A</color> //黃色
+    <color name="colorPrimaryDark">#fce38a</color> //黃色
     <color name="colorSecond">#EAFFD0</color> //淡黃色
     <color name="colorFocus">#FF4081</color> //淺綠色
 </resources>

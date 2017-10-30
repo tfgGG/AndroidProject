@@ -1,31 +1,35 @@
 package com.example.jessicahuang.myapplication;
 
+
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        EditText ParkingRoad = (EditText)findViewById(R.id.ParkingRoad_Num);
+        EditText ParkingLots = (EditText)findViewById(R.id.ParkingLots_Num);
+        Spinner  MeterSpinner = (Spinner)findViewById(R.id.MeterSpinner);
+
+        Integer[] items = new Integer[]{100,300,500,1000,1500};
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, items);
+        MeterSpinner.setAdapter(adapter);
+        MeterSpinner.setOnItemSelectedListener();
+
     }
 
     @Override
@@ -51,3 +55,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+

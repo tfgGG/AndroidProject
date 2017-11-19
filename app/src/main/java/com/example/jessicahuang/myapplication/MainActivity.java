@@ -1,9 +1,15 @@
 package com.example.jessicahuang.myapplication;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,10 +17,19 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 
 public class MainActivity extends AppCompatActivity  {
 
+    private FusedLocationProviderClient mFusedLocationClient;
+    private  Location location_Active = new Location("");
+    public GoolgeTool goolgeTool = new GoolgeTool();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +44,40 @@ public class MainActivity extends AppCompatActivity  {
             }
         });
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>()
+                {
+                    @Override
+                    public void onSuccess(Location location) {
+
+                        goolgeTool.setLon(location.getLongitude());
+                        goolgeTool.setLat(location.getLatitude());
+                        if (location == null) {
+                            Toast toastfail = Toast.makeText(MainActivity.this,"沒有位置資訊", Toast.LENGTH_LONG);
+                            toastfail.show();
+                        }
+                        else
+                        {
+                            String msg = "經度: "+location.getLatitude()+"緯度: "+location.getLongitude();
+                            Log.d("debug",msg);
+                            Toast toast = Toast.makeText(MainActivity.this,msg, Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    }
+                });
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,12 +91,9 @@ public class MainActivity extends AppCompatActivity  {
     public void sendMessage(View view) {
 
         Intent intent = new Intent(this, TestActivity.class);
-        String message = "To Test Page";
-        intent.putExtra("EXTRA", message);
+        intent.putExtra("goolgetool", goolgeTool);
         startActivity(intent);
     }
-
-
 
 
     @Override

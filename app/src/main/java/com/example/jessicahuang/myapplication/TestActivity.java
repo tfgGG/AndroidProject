@@ -18,10 +18,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,11 +55,20 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap map) {
+
         mgooglemap = map;
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(g.getLat(), g.getLon()))      // Sets the center of the map to location user
+                .zoom(17)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                .build();
+
         mgooglemap.addMarker(new MarkerOptions()
                 .position(new LatLng(g.getLat(),g.getLon()))
                 .title("現在位置"));
+
+        mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         //TODO:
-        //location_Active.getLongitude(), location_Active.getLatitude())
     }
 }

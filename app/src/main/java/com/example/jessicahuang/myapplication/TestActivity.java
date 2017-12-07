@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +63,7 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         } catch (IOException e) {
             e.printStackTrace();
-            msg="Failed";
+            msg="Failed"+ e.getMessage().toString();
         }
 
         TextView textaddress = (TextView)findViewById(R.id.textView2);
@@ -76,6 +77,9 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Button RetrieveBtn = (Button)findViewById(R.id.button2);
+
     }
 
     @Override

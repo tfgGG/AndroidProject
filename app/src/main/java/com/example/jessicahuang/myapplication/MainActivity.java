@@ -61,14 +61,15 @@ public class MainActivity extends AppCompatActivity  {
                     @Override
                     public void onSuccess(Location location) {
 
-                        goolgeTool.setLon(location.getLongitude());
-                        goolgeTool.setLat(location.getLatitude());
+
                         if (location == null) {
                             Toast toastfail = Toast.makeText(MainActivity.this,"沒有位置資訊", Toast.LENGTH_LONG);
                             toastfail.show();
                         }
                         else
                         {
+                            goolgeTool.setLon(location.getLongitude());
+                            goolgeTool.setLat(location.getLatitude());
                             String msg = "經度: "+location.getLatitude()+"緯度: "+location.getLongitude();
                             Log.d("debug",msg);
                             Toast toast = Toast.makeText(MainActivity.this,msg, Toast.LENGTH_LONG);

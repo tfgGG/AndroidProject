@@ -55,14 +55,13 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             addresses = geocoder.getFromLocation(g.getLat(), g.getLon(),1);
             Address address = addresses.get(0);
-            ArrayList<String> addressFragments = new ArrayList<String>();
 
             for(int i = 0; i <= address.getMaxAddressLineIndex(); i++)
                msg=msg+address.getAddressLine(i).toString();
 
         } catch (IOException e) {
             e.printStackTrace();
-            msg="Failed";
+            msg="沒有位置資訊 "+ e.getMessage().toString();
         }
 
         TextView textaddress = (TextView)findViewById(R.id.textView2);

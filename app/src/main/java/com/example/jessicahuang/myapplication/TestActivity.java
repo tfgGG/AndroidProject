@@ -15,9 +15,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,6 +50,8 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
     public  GoogleMap mgooglemap;
     public  GoolgeTool g;
     public List<Address> addresses;
+    String Ans;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -75,6 +84,15 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        final TextView retrievetxt = (TextView)findViewById(R.id.textView3);
+        Button retrievebtn = (Button)findViewById(R.id.button2);
+        retrievebtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                    retrievetxt.setText(getParking());
+            }
+        });
+
     }
 
     @Override
@@ -99,4 +117,34 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
+
+
+    public String getParking() {
+
+        String url ="http://140.136.148.203/Android_PHP/mes.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Ans= response;
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Ans = error.getMessage().toString();
+            }
+        });
+        QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
+        return  Ans;
+
+        //HTTPClient httPclient = new HTTPClient("http://140.136.148.203/Android_PHP/mes.php");
+        //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.getJsObjRequest());
+        //Log.d("THIS_IS_A_TEST:",);
+        //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.SetStringRequest());
+
+        //return httPclient.getAnsString();
+    }
 }
+
+

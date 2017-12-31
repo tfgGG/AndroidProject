@@ -17,7 +17,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class GoolgeTool extends FragmentActivity implements Parcelable
 {
-    private  GoogleMap mgooglemap;
     public   Location location = new Location("test");
     private double lat;
     private double lon;
@@ -53,11 +52,9 @@ public class GoolgeTool extends FragmentActivity implements Parcelable
     public void setLat(double lat){
         this.lat = lat;
     }
-
     public void setLon(double lon){
         this.lon = lon;
     }
-
     public double getLat(){
         return this.lat;
     }

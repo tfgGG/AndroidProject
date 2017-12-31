@@ -43,6 +43,7 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
     public  GoogleMap mgooglemap;
     public  GoolgeTool g;
     public List<Address> addresses;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

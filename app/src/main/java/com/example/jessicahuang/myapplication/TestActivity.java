@@ -23,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,6 +39,10 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +55,8 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
     public  GoogleMap mgooglemap;
     public  GoolgeTool g;
     public List<Address> addresses;
-    String Ans;
+    String Ans="";
+    TextView retrievetxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +91,12 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        final TextView retrievetxt = (TextView)findViewById(R.id.textView3);
+        retrievetxt = (TextView)findViewById(R.id.textView3);
         Button retrievebtn = (Button)findViewById(R.id.button2);
         retrievebtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                    retrievetxt.setText(getParking());
+                   // retrievetxt.setText(getParking());
+                    SetJSONObject();
             }
         });
 
@@ -118,11 +125,50 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    public  void SetJSONObject(){
+
+        String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        JSONArray responseArr=new JSONArray();
+                        JSONObject array;
+                        try {
+                            responseArr = response.getJSONArray("ParkingResult");
+                            Log.d("!!Success_1!!",responseArr.toString());
+                        }
+                        catch (JSONException e) {
+                            Log.d("!!Fail_1!!!",e.getMessage().toString());
+                        }
+                        try{
+                            for (int i = 0; i < responseArr.length(); i++)
+                            {
+                                array = responseArr.getJSONObject(i);
+                                Ans = array.getString("Name")+"\n" + Ans;
+                            }
+                            retrievetxt.setText(Ans);
+                            Log.d("!!Success_2!!",Ans);
+
+                        }catch (JSONException e) {
+                            //retrievetxt.setText("Exception!!!"+ e.getMessage().toString());
+                            Log.d("Fail_2!!!",e.getMessage().toString());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error){
+                        Log.d("!!!!!Error!!!!","JSON_Response_Error"+error.getMessage().toString());
+                    }
+                });
+        QueueSingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+
+    }
 
     public String getParking() {
 
         String url ="http://140.136.148.203/Android_PHP/mes.php";
-
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -137,12 +183,10 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
         return  Ans;
-
         //HTTPClient httPclient = new HTTPClient("http://140.136.148.203/Android_PHP/mes.php");
         //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.getJsObjRequest());
         //Log.d("THIS_IS_A_TEST:",);
         //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.SetStringRequest());
-
         //return httPclient.getAnsString();
     }
 }

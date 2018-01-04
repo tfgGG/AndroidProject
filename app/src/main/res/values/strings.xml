@@ -4,4 +4,5 @@
     <string name="Parking_road">附近停車空位</string>
     <string name="Parking_lots">附近停車場</string>
     <string name="meters">公尺內 </string>
+    <string name="title_activity_parking">ParkingActivity</string>
 </resources>

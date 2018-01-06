@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,8 +31,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -46,14 +49,16 @@ import java.util.Map;
 public class ParkingActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener {
 
     public GoogleMap mgooglemap;
-    public  GoolgeTool g;
+    public GoolgeTool g;
     public List<Address> addresses;
     String Ans="";
-    TextView retrievetxt;
     ListView listView;
     ParkingAdapter parkingAdapter;
     JSONObject requestObj;
     private GoogleApiClient mGoogleApiClient;
+    private int markerflag = 0;
+    private Marker marker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +103,22 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         SetJSONObject();
         parkingnum.setText("可停停車位:"+parkingAdapter.getYesPark()+" 個停車位");
         listView.setAdapter(parkingAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+
+                JSONObject obj = (JSONObject)adapter.getItemAtPosition(position);
+                try {
+                    SetSpaceMarker(obj.getDouble("Lat"),obj.getDouble("Lon"),obj.getString("Name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast toast = Toast.makeText(ParkingActivity.this,obj.toString(), Toast.LENGTH_LONG);
+                toast.show();
+
+            }
+        });
 
 
         mGoogleApiClient = new GoogleApiClient
@@ -154,6 +175,29 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         mgooglemap.addMarker(new MarkerOptions()
                 .position(new LatLng(g.getLat(),g.getLon()))
                 .title("現在位置"));
+
+        mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+    }
+    public void SetSpaceMarker(double Lat,double Lon,String name)
+    {
+
+        if(markerflag==0) {
+           marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
+                   .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            markerflag = 1;
+        }else{
+            marker.remove();
+            marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        }
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(Lat, Lon))      // Sets the center of the map to location user
+                .zoom(17)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                .build();
 
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 

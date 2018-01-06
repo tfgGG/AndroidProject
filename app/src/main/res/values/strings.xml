@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="action_settings">Settings</string>
+<<<<<<< HEAD
     <string name="Parking_road">附近停車空位</string>
     <string name="Parking_lots">附近停車場</string>
     <string name="meters">公尺內 </string>
     <string name="title_activity_parking">ParkingActivity</string>
+=======
+    <string name="title_activity_test">TestActivity</string>
+>>>>>>> GoogleMap_tfgGG
 </resources>

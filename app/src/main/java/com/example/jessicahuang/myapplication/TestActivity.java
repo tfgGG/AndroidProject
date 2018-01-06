@@ -1,48 +1,55 @@
 package com.example.jessicahuang.myapplication;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import java.util.Map;
+import java.util.Set;
 
 public class TestActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     public  GoogleMap mgooglemap;
     public  GoolgeTool g;
     public List<Address> addresses;
+    String Ans="";
+    TextView retrievetxt;
+    ListView listView;
+    ParkingAdapter parkingAdapter;
+    JSONObject requestObj;
+/*<<<<<<< HEAD
+=======
+
+>>>>>>> HTTP_LIstView*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +83,20 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        retrievetxt = (TextView)findViewById(R.id.textView3);
+        Button retrievebtn = (Button)findViewById(R.id.button2);
+        retrievebtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                  // retrievetxt.setText(SetJSONObject());
+                   SetJSONObject();
+            }
+        });
+
+         listView = (ListView) findViewById(R.id.ParkingList);
+         parkingAdapter = new ParkingAdapter(this);
+         //SetJSONObject();
+         listView.setAdapter(parkingAdapter);
     }
 
     @Override
@@ -100,4 +121,86 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
+
+    public  String SetJSONObject(){
+        String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
+        //String requestBody = "?Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
+        String JsonOb = "{\"Lat\":\""+g.getLat()+"\",\"Lon\":\""+ g.getLon()+"\"}";
+        try {
+            requestObj = new JSONObject(JsonOb);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, requestObj, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        JSONArray responseArr;
+                        try {
+                            responseArr = response.getJSONArray("ParkingResult");
+                            parkingAdapter.updateData(responseArr);
+                            //Ans = response.toString();
+                            Log.d("!!Success_1!!",response.toString());
+                        }
+                        catch (Exception e) {
+                            Log.d("!!Fail_1!!!",e.getMessage().toString());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error){
+                        Log.d("!!!!!Error!!!!","JSON_Response_Error"+error.getMessage().toString());
+                    }
+                });
+
+                   /* @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("Lat", String.valueOf(g.getLat()) );
+                        map.put("Lon", String.valueOf(g.getLon()) );
+                        return map;
+                    }*/
+
+        QueueSingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        return  Ans;
+
+    }
+
+    public String getParking() {
+
+        //String requestBody = "Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
+        //String url ="http://140.136.148.203/Android_PHP/mes.php";
+        String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Ans= response;
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Ans = error.getMessage().toString();
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("Lat", String.valueOf(g.getLat()) );
+                map.put("Lon", String.valueOf(g.getLon()) );
+                return map;
+            }
+        };
+        QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
+        return  Ans;
+        //HTTPClient httPclient = new HTTPClient("http://140.136.148.203/Android_PHP/mes.php");
+        //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.getJsObjRequest());
+        //Log.d("THIS_IS_A_TEST:",);
+        //QueueSingleton.getInstance(this).addToRequestQueue(httPclient.SetStringRequest());
+        //return httPclient.getAnsString();
+    }
 }
+
+

@@ -39,10 +39,6 @@
             android:name=".GarbageActiviy" >
         </activity>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAIdumreSotx4kFR8le3AGLsOhukz1RRn0"/>
-
 
 </application>
 

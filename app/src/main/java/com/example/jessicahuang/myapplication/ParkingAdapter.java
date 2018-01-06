@@ -51,7 +51,6 @@ public class ParkingAdapter extends BaseAdapter {
         return String.valueOf(count);
     }
 
-
     @Override
     public int getCount() {
         return mJsonArray.length();

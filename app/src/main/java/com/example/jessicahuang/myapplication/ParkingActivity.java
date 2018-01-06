@@ -1,18 +1,16 @@
 package com.example.jessicahuang.myapplication;
 
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -20,6 +18,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -32,13 +38,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ParkingActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class ParkingActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener {
 
     public GoogleMap mgooglemap;
     public  GoolgeTool g;
@@ -48,6 +53,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     ListView listView;
     ParkingAdapter parkingAdapter;
     JSONObject requestObj;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +98,42 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         SetJSONObject();
         parkingnum.setText("可停停車位:"+parkingAdapter.getYesPark()+" 個停車位");
         listView.setAdapter(parkingAdapter);
+
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this,this)
+                .build();
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+
+                String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
+                Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
+                toast.show();
+                Log.i("Success", "Place: " + place.getName());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                String messege = status.getStatusMessage();
+                Toast toast = Toast.makeText(ParkingActivity.this,messege, Toast.LENGTH_LONG);
+                toast.show();
+                Log.i("Failed", "An error occurred: " + status);
+            }
+        });
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
+
 
     }
 
@@ -182,6 +224,13 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         };
         QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
         return  Ans;
+    }
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        Toast toast = Toast.makeText(ParkingActivity.this,connectionResult.toString(), Toast.LENGTH_LONG);
+        toast.show();
+
     }
 
 }

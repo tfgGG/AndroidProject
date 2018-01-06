@@ -85,7 +85,7 @@ public class ParkingAdapter extends BaseAdapter {
 
         try {
             holder.PayText.setText(jsonObject.getString("PayCash"));
-            holder.AddressText.setText("Default");
+            holder.AddressText.setText(jsonObject.getString("Name")+jsonObject.getString("Distance"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

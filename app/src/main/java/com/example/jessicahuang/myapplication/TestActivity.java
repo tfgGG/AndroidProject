@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -29,8 +30,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class TestActivity extends AppCompatActivity implements OnMapReadyCallback{
 
@@ -41,6 +45,7 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
     TextView retrievetxt;
     ListView listView;
     ParkingAdapter parkingAdapter;
+    JSONObject requestObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,27 +84,16 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button retrievebtn = (Button)findViewById(R.id.button2);
         retrievebtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                   // retrievetxt.setText(getParking());
-                    SetJSONObject();
+                  // retrievetxt.setText(SetJSONObject());
+                   SetJSONObject();
             }
         });
 
          listView = (ListView) findViewById(R.id.ParkingList);
          parkingAdapter = new ParkingAdapter(this);
-         SetJSONObject();
+         //SetJSONObject();
          listView.setAdapter(parkingAdapter);
     }
-
-    /*public void LoadList(){
-
-        for (int i = 0; i < responseArr.length(); i++)
-        {
-            array = responseArr.getJSONObject(i);
-            Ans = array.getString("Name")+"\n" + Ans;
-        }
-        retrievetxt.setText(Ans);
-        Log.d("!!Success_2!!",Ans);
-    }*/
 
     @Override
     public void onMapReady(GoogleMap map) {
@@ -124,11 +118,17 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public  void SetJSONObject(){
-
+    public  String SetJSONObject(){
         String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
+        //String requestBody = "?Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
+        String JsonOb = "{\"Lat\":\""+g.getLat()+"\",\"Lon\":\""+ g.getLon()+"\"}";
+        try {
+            requestObj = new JSONObject(JsonOb);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, url, requestObj, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)
                     {
@@ -136,9 +136,10 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
                         try {
                             responseArr = response.getJSONArray("ParkingResult");
                             parkingAdapter.updateData(responseArr);
-                            Log.d("!!Success_1!!",responseArr.toString());
+                            //Ans = response.toString();
+                            Log.d("!!Success_1!!",response.toString());
                         }
-                        catch (JSONException e) {
+                        catch (Exception e) {
                             Log.d("!!Fail_1!!!",e.getMessage().toString());
                         }
                     }
@@ -148,14 +149,26 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.d("!!!!!Error!!!!","JSON_Response_Error"+error.getMessage().toString());
                     }
                 });
+
+                   /* @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("Lat", String.valueOf(g.getLat()) );
+                        map.put("Lon", String.valueOf(g.getLon()) );
+                        return map;
+                    }*/
+
         QueueSingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        return  Ans;
 
     }
 
     public String getParking() {
 
-        String url ="http://140.136.148.203/Android_PHP/mes.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        //String requestBody = "Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
+        //String url ="http://140.136.148.203/Android_PHP/mes.php";
+        String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -166,7 +179,16 @@ public class TestActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onErrorResponse(VolleyError error) {
                 Ans = error.getMessage().toString();
             }
-        });
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("Lat", String.valueOf(g.getLat()) );
+                map.put("Lon", String.valueOf(g.getLon()) );
+                return map;
+            }
+        };
         QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
         return  Ans;
         //HTTPClient httPclient = new HTTPClient("http://140.136.148.203/Android_PHP/mes.php");

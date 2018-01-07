@@ -52,7 +52,7 @@ import java.util.Map;
 public class ParkingActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener {
 
     public GoogleMap mgooglemap;
-    public GoolgeTool g;
+    private GoolgeTool g;
     public List<Address> addresses;
     String Ans="";
     ListView listView;
@@ -72,23 +72,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.content_parking);
 
         g = getIntent().getParcelableExtra("goolgetool");
-        String msg="";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            addresses = geocoder.getFromLocation(g.getLat(), g.getLon(),1);
-            Address address = addresses.get(0);
-
-            for(int i = 0; i <= address.getMaxAddressLineIndex(); i++)
-                msg=msg+address.getAddressLine(i).toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            msg="沒有位置資訊 "+ e.getMessage().toString();
-        }
 
         TextView parkingnum = (TextView)findViewById(R.id.ParkingNum);
         TextView addresstxt = (TextView)findViewById(R.id.Address);
-        addresstxt.setText(msg);
+        addresstxt.setText(g.getAddress());
         addresstxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -264,8 +251,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     public  void SetJSONObject(Double Lat,Double Lon){
         String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
-        //String requestBody = "?Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
-        String JsonOb = "{\"Lat\":\""+Lat+"\",\"Lon\":\""+ Lon+"\"}";
+        String JsonOb = "{\"Lat\":\"" +Lat+ "\",\"Lon\":\"" + Lon +"\"}";
         try {
             requestObj = new JSONObject(JsonOb);
         } catch (JSONException e) {

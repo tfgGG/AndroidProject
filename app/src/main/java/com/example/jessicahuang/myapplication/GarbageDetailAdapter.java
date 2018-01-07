@@ -12,43 +12,47 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
+
 /**
  * Created by jessicahuang on 2017/12/31.
  */
 
-public class ParkingAdapter extends BaseAdapter {
+public class GarbageDetailAdapter extends BaseAdapter {
 
     private LayoutInflater mInflater;
     private JSONArray mJsonArray;
 
     private static class ViewHolder {
-        ImageView ImageView;
+        TextView RemainText;
         TextView AddressText;
-        TextView PayText;
+
+        /*public void setData(Product item) {
+            mProduct = item;
+            tvProduct.setText(item.name);
+            updateTimeRemaining(System.currentTimeMillis());
+        }*/
+
     }
     void updateData(JSONArray jsonArray) {
         mJsonArray = jsonArray;
         notifyDataSetChanged();
     }
-    ParkingAdapter(Context context) {
+    GarbageDetailAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
         mJsonArray = new JSONArray();
     }
-    public String getYesPark(){
-
-        int count=0;
-        for(int i=0;i<getCount();i++)
-        {
-            JSONObject jsonObject = (JSONObject) getItem(i);
-            try {
-                if(jsonObject.getString("CellStatus").compareTo("Y")==0)
-                    count++;
-            } catch (JSONException e) {
-                e.printStackTrace();
+   /* private Runnable updateRemainingTimeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            synchronized (lstHolders) {
+                long currentTime = System.currentTimeMillis();
+                for (ViewHolder holder : lstHolders) {
+                    holder.updateTimeRemaining(currentTime);
+                }
             }
         }
-        return String.valueOf(count);
-    }
+    };*/
 
     @Override
     public int getCount() {
@@ -72,11 +76,10 @@ public class ParkingAdapter extends BaseAdapter {
         // 檢查view是否已存在，如果已存在就不用再取一次id
         if (convertView == null) {
             // Inflate the custom row layout from your XML.
-            convertView = mInflater.inflate(R.layout.parking_list, parent, false);
+            convertView = mInflater.inflate(R.layout.garbage_detail_list, parent, false);
             holder = new ViewHolder();
-            holder.ImageView = (ImageView) convertView.findViewById(R.id.imageView);
-            holder.AddressText = (TextView) convertView.findViewById(R.id.Name);
-            holder.PayText = (TextView) convertView.findViewById(R.id.PayText);
+            holder.AddressText = (TextView) convertView.findViewById(R.id.Addresstxt);
+            holder.RemainText = (TextView) convertView.findViewById(R.id.RemainTime);
             // hang onto this holder for future recyclage
             convertView.setTag(holder);
         } else {
@@ -84,20 +87,10 @@ public class ParkingAdapter extends BaseAdapter {
         }
 
         JSONObject jsonObject = (JSONObject) getItem(position);
-        try{
-            String name =  jsonObject.getString("Name");
-            if(name.compareTo("汽車停車位")==0)
-                holder.ImageView.setImageResource(R.mipmap.ic_launcher);
-            else
-                holder.ImageView.setImageResource(R.mipmap.ic_launcher_round);
-
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         try {
-            holder.PayText.setText(jsonObject.getString("PayCash"));
-            holder.AddressText.setText(jsonObject.getString("Name")+jsonObject.getString("Distance"));
+            holder.AddressText.setText(jsonObject.getString("Village")+jsonObject.getString("Name"));
+            holder.RemainText.setText(jsonObject.getString("Time"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

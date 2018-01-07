@@ -20,6 +20,7 @@ public class GoolgeTool extends FragmentActivity implements Parcelable
     public   Location location = new Location("test");
     private double lat;
     private double lon;
+    private String address;
 
     public void setLocation(Location location){
         this.location = location;
@@ -30,6 +31,7 @@ public class GoolgeTool extends FragmentActivity implements Parcelable
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeDouble(lat);
         dest.writeDouble(lon);
+        dest.writeString(address);
     }
 
     public static final Parcelable.Creator<GoolgeTool> CREATOR = new Parcelable.Creator<GoolgeTool>(){
@@ -40,6 +42,7 @@ public class GoolgeTool extends FragmentActivity implements Parcelable
             GoolgeTool g =new GoolgeTool();
             g.setLat(parcel.readDouble());
             g.setLon(parcel.readDouble());
+            g.setAddress(parcel.readString());
             return g;
         }
 
@@ -55,11 +58,17 @@ public class GoolgeTool extends FragmentActivity implements Parcelable
     public void setLon(double lon){
         this.lon = lon;
     }
+    public void setAddress(String address){
+        this.address = address;
+    }
     public double getLat(){
         return this.lat;
     }
     public double getLon(){
         return  this.lon;
+    }
+    public String getAddress(){
+        return  this.address;
     }
 
     @Override

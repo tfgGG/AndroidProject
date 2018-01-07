@@ -55,7 +55,8 @@ public class GarbageDetailActiviy extends AppCompatActivity implements OnMapRead
     private GoolgeTool g;
     public GoogleMap mgooglemap;
     JSONObject requestObj;
-    private int markerflag = 0;
+    JSONArray responseArr;
+    int markerflag = 0;
     private Marker marker;
 
     @Override
@@ -65,12 +66,14 @@ public class GarbageDetailActiviy extends AppCompatActivity implements OnMapRead
 
         ID = getIntent().getStringExtra("Id");
         g = getIntent().getParcelableExtra("googletool");
+        String name= getIntent().getStringExtra("Name");
 
         Toast toast = Toast.makeText(GarbageDetailActiviy.this,ID, Toast.LENGTH_LONG);
         toast.show();
 
         garbagename = (TextView)findViewById(R.id.GarbageName);
         addresstxt = (TextView)findViewById(R.id.Address);
+        garbagename.setText(name);
 
         ImageButton home = (ImageButton)findViewById(R.id.home);
         home.setOnClickListener(new ImageButton.OnClickListener(){
@@ -148,6 +151,7 @@ public class GarbageDetailActiviy extends AppCompatActivity implements OnMapRead
                 .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                 .build();
 
+
         mgooglemap.addMarker(new MarkerOptions()
                 .position(new LatLng(g.getLat(),g.getLon()))
                 .title("現在位置"));
@@ -192,7 +196,6 @@ public class GarbageDetailActiviy extends AppCompatActivity implements OnMapRead
                     @Override
                     public void onResponse(JSONObject response)
                     {
-                        JSONArray responseArr;
                         try {
                             responseArr = response.getJSONArray("ParkingResult");
                             GarbageDetailAdapter.updateData(responseArr);

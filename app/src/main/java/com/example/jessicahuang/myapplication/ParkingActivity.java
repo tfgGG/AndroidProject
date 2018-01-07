@@ -31,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -54,7 +55,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     public GoogleMap mgooglemap;
     private GoolgeTool g;
     public List<Address> addresses;
-    String Ans="";
     ListView listView;
     ParkingAdapter parkingAdapter;
     JSONObject requestObj;
@@ -63,6 +63,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     private Marker marker;
     private Marker searchmarker;
     ArrayList<Circle> circlearray ;
+    Place plcaceset;
 
 
     @Override
@@ -75,10 +76,12 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         TextView parkingnum = (TextView)findViewById(R.id.ParkingNum);
         TextView addresstxt = (TextView)findViewById(R.id.Address);
+
         addresstxt.setText(g.getAddress());
         addresstxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                plcaceset  = null;
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(g.getLat(), g.getLon()))      // Sets the center of the map to location user
                         .zoom(17)                   // Sets the zoom
@@ -145,6 +148,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onPlaceSelected(Place place) {
 
+                 plcaceset=place;
                 String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
                 Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
                 toast.show();
@@ -223,31 +227,54 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
     public  void DrawCircle(){
-        JSONObject obj;
-        for (int i=0;i<parkingAdapter.getCount();i++)
-        {
-            obj = (JSONObject) parkingAdapter.getItem(i);
-            CircleOptions circleOptions = null;
-            try {
-                circleOptions = new CircleOptions()
-                        .center(new LatLng(obj.getDouble("Lat"), obj.getDouble("Lon")))
-                        .radius(5000);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        try {
+            JSONObject obj;
+            BitmapDescriptor iconNo = BitmapDescriptorFactory.fromResource(R.drawable.redpoint);
+            BitmapDescriptor iconYes = BitmapDescriptorFactory.fromResource(R.drawable.greenpot);
+            for (int i=0;i<parkingAdapter.getCount();i++)
+            {
+                obj = (JSONObject) parkingAdapter.getItem(i);
+                String status = obj.getString("CellStatus");
 
-            Circle circle = mgooglemap.addCircle(circleOptions);
-            circlearray.add(circle);
+                Marker marker = mgooglemap.addMarker(new MarkerOptions()
+                        .position(new LatLng(obj.getDouble("Lat"),obj.getDouble("Lon"))));
+
+                if (obj.getString("CellStatus").compareTo("Y")==0)
+                    marker.setIcon(iconYes);
+                else
+                    marker.setIcon(iconNo);
+        }
+        }catch (JSONException e) {
+            e.printStackTrace();
         }
     }
-
+/*
     public void RefreshData(){
 
-
-    //TODO:
-
-
-    }
+        String url = "http://140.136.148.203/Android_PHP/UpdateParkingStatus.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String  Ans= response;
+                        Toast toast = Toast.makeText(ParkingActivity.this, "Success.....", Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast toast = Toast.makeText(ParkingActivity.this, "Error.....", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+        QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
+        Toast toast = Toast.makeText(ParkingActivity.this, "sdrgawergawergawer", Toast.LENGTH_LONG);
+        toast.show();
+        if(plcaceset == null)
+            SetJSONObject(g.getLat(),g.getLon());
+        else
+            SetJSONObject(plcaceset.getLatLng().latitude,plcaceset.getLatLng().longitude);
+    }*/
 
     public  void SetJSONObject(Double Lat,Double Lon){
         String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
@@ -266,7 +293,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                         try {
                             responseArr = response.getJSONArray("ParkingResult");
                             parkingAdapter.updateData(responseArr);
-                            //Ans = response.toString();
+                            DrawCircle();
                             Log.d("!!Success_1!!",response.toString());
                         }
                         catch (Exception e) {
@@ -285,40 +312,17 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
-    public String getParking() {
-
-        //String requestBody = "Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
-        //String url ="http://140.136.148.203/Android_PHP/mes.php";
-        String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Ans= response;
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Ans = error.getMessage().toString();
-            }
-        })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("Lat", String.valueOf(g.getLat()) );
-                map.put("Lon", String.valueOf(g.getLon()) );
-                return map;
-            }
-        };
-        QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
-        return  Ans;
-    }
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
         Toast toast = Toast.makeText(ParkingActivity.this,connectionResult.toString(), Toast.LENGTH_LONG);
         toast.show();
+
+    }
+
+    public void RefreshData(){
+
+
 
     }
 

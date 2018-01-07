@@ -73,6 +73,7 @@ public class GarbageActiviy extends AppCompatActivity implements GoogleApiClient
                 try {
                     intent.putExtra("Id", obj.getString("LineId"));
                     intent.putExtra("googletool",g);
+                    intent.putExtra("Name",obj.getString("City")+obj.getString("LineName"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -103,7 +104,7 @@ public class GarbageActiviy extends AppCompatActivity implements GoogleApiClient
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error){
-                        Log.d("!!!!!Error!!!!","JSON_Response_Error"+error.getMessage().toString());
+                        //Log.d("!!!!!Error!!!!","JSON_Response_Error"+error.getMessage().toString());
                     }
                 });
 

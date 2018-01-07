@@ -4,16 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="90dp">
 
-    <TextView
-        android:id="@+id/NowText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
-        android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:layout_alignTop="@+id/imageView"
-        android:layout_alignParentEnd="true" />
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -27,20 +17,21 @@
         android:id="@+id/Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/NowText"
-        android:layout_alignStart="@+id/Addresstxt"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_above="@+id/imageView"
+        android:layout_alignStart="@+id/Addresstxt" />
 
     <TextView
         android:id="@+id/Addresstxt"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/NowText"
-        android:layout_marginStart="11dp"
+        android:layout_below="@+id/Name"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="13dp"
         android:layout_toEndOf="@+id/imageView"
         android:maxLines="3"
         android:minLines="2"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 </RelativeLayout>

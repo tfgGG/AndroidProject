@@ -12,9 +12,11 @@
         android:layout_width="207dp"
         android:layout_height="26dp"
         android:layout_marginBottom="8dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginLeft="72dp"
+        android:layout_marginStart="72dp"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <ImageButton
@@ -32,8 +34,8 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        tools:layout_editor_absoluteY="524dp"
-        tools:layout_editor_absoluteX="335dp" />
+        android:layout_marginStart="280dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -49,7 +51,9 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.023"
-        app:layout_constraintVertical_bias="0.935" />
+        app:layout_constraintVertical_bias="0.935"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -65,7 +69,9 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.024"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/Address"
@@ -82,19 +88,19 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.932"
-        app:layout_constraintHorizontal_bias="0.39" />
+        app:layout_constraintHorizontal_bias="0.39"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <ScrollView
         android:layout_width="357dp"
         android:layout_height="256dp"
         android:layout_marginBottom="104dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_editor_absoluteY="207dp"
-        tools:layout_editor_absoluteX="15dp">
+        app:layout_constraintLeft_toLeftOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,7 +118,7 @@
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.MapFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="162dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
@@ -123,7 +129,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.02" />
+        app:layout_constraintVertical_bias="0.02"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
 
 </android.support.constraint.ConstraintLayout>

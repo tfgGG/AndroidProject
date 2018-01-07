@@ -25,7 +25,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FusedLocationProviderClient mFusedLocationClient;
+    public FusedLocationProviderClient mFusedLocationClient;
     public GoolgeTool goolgeTool = new GoolgeTool();
     private static final int REQUEST_LOCATION = 1;
     public List<Address> addresses;

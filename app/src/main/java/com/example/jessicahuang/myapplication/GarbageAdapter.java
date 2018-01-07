@@ -25,7 +25,6 @@ public class GarbageAdapter extends BaseAdapter {
         ImageView ImageView;
         TextView NameText;
         TextView VillageText;
-        TextView NowText;
 
     }
     void updateData(JSONArray jsonArray) {
@@ -65,7 +64,6 @@ public class GarbageAdapter extends BaseAdapter {
             holder.ImageView = (ImageView) convertView.findViewById(R.id.imageView);
             holder.NameText = (TextView) convertView.findViewById(R.id.Name);
             holder.VillageText = (TextView) convertView.findViewById(R.id.Addresstxt);
-            holder.NowText = (TextView) convertView.findViewById(R.id.NowText);
             // hang onto this holder for future recyclage
             convertView.setTag(holder);
         } else {
@@ -78,7 +76,6 @@ public class GarbageAdapter extends BaseAdapter {
         try {
             holder.NameText.setText(jsonObject.getString("City")+jsonObject.getString("LineName"));
             holder.VillageText.setText(jsonObject.getString("Village"));
-            holder.NowText.setText("Default");
 
         } catch (JSONException e) {
             e.printStackTrace();

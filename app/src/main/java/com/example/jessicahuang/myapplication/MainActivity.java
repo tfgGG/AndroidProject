@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -17,29 +19,26 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.List;
+import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient mFusedLocationClient;
     public GoolgeTool goolgeTool = new GoolgeTool();
     private static final int REQUEST_LOCATION = 1;
+    public List<Address> addresses;
+    String msg="";
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
 
-        /*EditText ParkingRoad = (EditText)findViewById(R.id.ParkingRoad_Num);
-        EditText ParkingLots = (EditText)findViewById(R.id.ParkingLots_Num);
-        Spinner  MeterSpinner = (Spinner)findViewById(R.id.MeterSpinner);*/
         ImageButton parking = (ImageButton) MainActivity.this.findViewById(R.id.parking);
         ImageButton garbage = (ImageButton) MainActivity.this.findViewById(R.id.garbage);
         ImageButton setting = (ImageButton) MainActivity.this.findViewById(R.id.setting);
-
-        /*Integer[] items = new Integer[]{100,300,500,1000,1500};
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, items);
-        MeterSpinner.setAdapter(adapter);
-        MeterSpinner.setOnItemSelectedListener();*/
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -67,6 +66,18 @@ public class MainActivity extends AppCompatActivity {
                     });
             Log.d("!!!GETLOCATION!!!","LATITUDE"+goolgeTool.getLat());
         }
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(goolgeTool.getLat(),goolgeTool.getLon(),1);
+            Address address = addresses.get(0);
+
+            for(int i = 0; i <= address.getMaxAddressLineIndex(); i++)
+                msg=msg+address.getAddressLine(i).toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg="沒有位置資訊 "+ e.getMessage().toString();
+        }goolgeTool.setAddress(msg);
 
         garbage.setOnClickListener(new ImageButton.OnClickListener(){
             @Override

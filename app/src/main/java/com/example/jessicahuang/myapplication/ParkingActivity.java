@@ -33,6 +33,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -41,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,9 +58,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     ListView listView;
     ParkingAdapter parkingAdapter;
     JSONObject requestObj;
-    private GoogleApiClient mGoogleApiClient;
+    GoogleApiClient mGoogleApiClient;
     private int markerflag = 0;
     private Marker marker;
+    ArrayList<Circle> circlearray ;
 
 
     @Override
@@ -84,13 +88,31 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         TextView parkingnum = (TextView)findViewById(R.id.ParkingNum);
         TextView addresstxt = (TextView)findViewById(R.id.Address);
         addresstxt.setText(msg);
-        //TODO:changetxt
-       // parkingnum.setText("經度:"+ g.getLat() + "緯度:" + g.getLon());
+        addresstxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(g.getLat(), g.getLon()))      // Sets the center of the map to location user
+                        .zoom(17)                   // Sets the zoom
+                        .bearing(90)                // Sets the orientation of the camera to east
+                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                        .build();
+                mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        });
+
         ImageButton home = (ImageButton)findViewById(R.id.home);
         home.setOnClickListener(new ImageButton.OnClickListener(){
             @Override
             public void onClick(View view){
                 finish();
+            }
+        });
+        ImageButton refresh = (ImageButton)findViewById(R.id.refresh);
+        refresh.setOnClickListener(new ImageButton.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                RefreshData();
             }
         });
 
@@ -100,11 +122,11 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         listView = (ListView) findViewById(R.id.ParkingList);
         parkingAdapter = new ParkingAdapter(this);
-        SetJSONObject();
+        SetJSONObject(g.getLat(),g.getLon());
+        DrawCircle();
         parkingnum.setText("可停停車位:"+parkingAdapter.getYesPark()+" 個停車位");
         listView.setAdapter(parkingAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 
@@ -138,6 +160,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
                 Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
                 toast.show();
+                markerflag = 2; //Click Search
+                //circlearray.clear();
+                SetJSONObject(place.getLatLng().latitude,place.getLatLng().longitude);
+                SetSpaceMarker(place.getLatLng().latitude,place.getLatLng().longitude,place.getName().toString());
                 Log.i("Success", "Place: " + place.getName());
             }
 
@@ -150,10 +176,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 Log.i("Failed", "An error occurred: " + status);
             }
         });
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+       /* AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
                 .build();
-        autocompleteFragment.setFilter(typeFilter);
+        autocompleteFragment.setFilter(typeFilter);*/
 
 
     }
@@ -179,17 +205,20 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
-    public void SetSpaceMarker(double Lat,double Lon,String name)
-    {
+    public void SetSpaceMarker(double Lat,double Lon,String name) {
 
         if(markerflag==0) {
            marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             markerflag = 1;
-        }else{
+        }else if(markerflag==1){
             marker.remove();
             marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        }else {
+            marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+            markerflag = 0;
         }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -202,11 +231,37 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
+    public  void DrawCircle(){
+        JSONObject obj;
+        for (int i=0;i<parkingAdapter.getCount();i++)
+        {
+            obj = (JSONObject) parkingAdapter.getItem(i);
+            CircleOptions circleOptions = null;
+            try {
+                circleOptions = new CircleOptions()
+                        .center(new LatLng(obj.getDouble("Lat"), obj.getDouble("Lon")))
+                        .radius(5000);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-    public  String SetJSONObject(){
+            Circle circle = mgooglemap.addCircle(circleOptions);
+            circlearray.add(circle);
+        }
+    }
+
+    public void RefreshData(){
+
+
+    //TODO:
+
+
+    }
+
+    public  void SetJSONObject(Double Lat,Double Lon){
         String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
         //String requestBody = "?Lat="+String.valueOf(g.getLat())+"&Lon="+String.valueOf(g.getLon());
-        String JsonOb = "{\"Lat\":\""+g.getLat()+"\",\"Lon\":\""+ g.getLon()+"\"}";
+        String JsonOb = "{\"Lat\":\""+Lat+"\",\"Lon\":\""+ Lon+"\"}";
         try {
             requestObj = new JSONObject(JsonOb);
         } catch (JSONException e) {
@@ -221,6 +276,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                         try {
                             responseArr = response.getJSONArray("ParkingResult");
                             parkingAdapter.updateData(responseArr);
+                            DrawCircle();
                             //Ans = response.toString();
                             Log.d("!!Success_1!!",response.toString());
                         }
@@ -236,7 +292,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 });
 
         QueueSingleton.getInstance(this).addToRequestQueue(jsObjRequest);
-        return  Ans;
+        //return  Ans;
 
     }
 

@@ -61,6 +61,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     GoogleApiClient mGoogleApiClient;
     private int markerflag = 0;
     private Marker marker;
+    private Marker searchmarker;
     ArrayList<Circle> circlearray ;
 
 
@@ -98,6 +99,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                         .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                         .build();
                 mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                SetJSONObject(g.getLat(),g.getLon());
             }
         });
 
@@ -123,7 +125,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         listView = (ListView) findViewById(R.id.ParkingList);
         parkingAdapter = new ParkingAdapter(this);
         SetJSONObject(g.getLat(),g.getLon());
-        DrawCircle();
         parkingnum.setText("可停停車位:"+parkingAdapter.getYesPark()+" 個停車位");
         listView.setAdapter(parkingAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -160,8 +161,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
                 Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
                 toast.show();
-                markerflag = 2; //Click Search
-                //circlearray.clear();
+                markerflag = 2;
                 SetJSONObject(place.getLatLng().latitude,place.getLatLng().longitude);
                 SetSpaceMarker(place.getLatLng().latitude,place.getLatLng().longitude,place.getName().toString());
                 Log.i("Success", "Place: " + place.getName());
@@ -216,7 +216,11 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
         }else {
-            marker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
+            if(marker != null)
+                marker.remove();
+            if(searchmarker!=null)
+                searchmarker.remove();
+            searchmarker = mgooglemap.addMarker(new MarkerOptions().position(new LatLng(Lat, Lon)).title(name)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
             markerflag = 0;
         }
@@ -276,7 +280,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                         try {
                             responseArr = response.getJSONArray("ParkingResult");
                             parkingAdapter.updateData(responseArr);
-                            DrawCircle();
                             //Ans = response.toString();
                             Log.d("!!Success_1!!",response.toString());
                         }

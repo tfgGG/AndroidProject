@@ -11,11 +11,12 @@
         android:id="@+id/Address"
         android:layout_width="229dp"
         android:layout_height="32dp"
-        android:text="TextView"
+        android:layout_marginBottom="16dp"
         android:layout_marginLeft="59dp"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <ImageButton
         android:id="@+id/home"

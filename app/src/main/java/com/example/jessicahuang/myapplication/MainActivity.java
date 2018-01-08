@@ -2,11 +2,13 @@ package com.example.jessicahuang.myapplication;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_LOCATION = 1;
     public List<Address> addresses;
     String msg="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        /*mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
@@ -67,8 +70,34 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
             Log.d("!!!GETLOCATION!!!","LATITUDE"+goolgeTool.getLat());
+        }*/
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_LOCATION);
+            Log.d("!!!!REQUEST!!!","PERMISION");
+        }else {
+            LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            Location l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Location l2 = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location l3 = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+
+            if(l != null){
+                goolgeTool.setLat(l.getLatitude());
+                goolgeTool.setLon(l.getLongitude());
+            }else if(l2 != null){
+                goolgeTool.setLat(l2.getLatitude());
+                goolgeTool.setLon(l2.getLongitude());
+            }else if(l3 != null){
+                goolgeTool.setLat(l3.getLatitude());
+                goolgeTool.setLon(l3.getLongitude());
+            }else{
+                Toast toast = Toast.makeText(MainActivity.this, "無法取得位置", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
         }
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        Geocoder geocoder = new Geocoder(this, Locale.TAIWAN);
         try {
             addresses = geocoder.getFromLocation(goolgeTool.getLat(),goolgeTool.getLon(),1);
             Address address = addresses.get(0);
@@ -80,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             msg="沒有位置資訊 "+ e.getMessage().toString();
         }
-
-       goolgeTool.setAddress(msg);
+        goolgeTool.setAddress(msg);
 
         garbage.setOnClickListener(new ImageButton.OnClickListener(){
             @Override
@@ -108,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.startActivity(intent);
             }
         });
-
+        Log.d("debug","MainActivity OnCreate");
     }
 
 

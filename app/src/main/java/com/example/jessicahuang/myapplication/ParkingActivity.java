@@ -75,13 +75,14 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     TextView addresstxt;
     LocationManager locationManager;
     double lat,lon;
-
+    Geocoder geocoder ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_parking);
 
+        geocoder= new Geocoder(this,Locale.TAIWAN);
         g = getIntent().getParcelableExtra("goolgetool");
         lat = g.getLat();
         lon = g.getLon();
@@ -188,6 +189,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
             return;
         }
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener listener = new LocationListener() {
             @Override
@@ -195,8 +197,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 lat = location.getLatitude();
                 lon = location.getLongitude();
                 SetJSONObject(lat,lon);
-                addresstxt.setText(" "+lat + " " + lon);
-                Nowmarker.remove();
+                getNowAdress();
                 AddNowMarker(lat,lon);
             }
             @Override
@@ -212,8 +213,23 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
         };
         // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        locationManager.requestLocationUpdates("gps", 2000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
 
+    }
+    public void getNowAdress() {
+        String msg = " ";
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat,lon,1);
+            Address address = addresses.get(0);
+
+            for(int i = 0; i <= address.getMaxAddressLineIndex(); i++)
+                msg=msg+address.getAddressLine(i).toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg="沒有位置資訊 "+ e.getMessage().toString();
+        }
+        addresstxt.setText(msg);
     }
 
     @Override
@@ -221,21 +237,22 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         mgooglemap = map;
         //TODO:Get map road and detail
         mgooglemap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        AddNowMarker(g.getLat(), g.getLon());
-    }
-    public void AddNowMarker(double lat,double lon){
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(lat,lon))      // Sets the center of the map to location user
                 .zoom(17)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
                 .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                 .build();
+        AddNowMarker(g.getLat(), g.getLon());
+        mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+    public void AddNowMarker(double lat,double lon){
 
+        if(Nowmarker!=null)
+        Nowmarker.remove();
         Nowmarker = mgooglemap.addMarker(new MarkerOptions()
                 .position(new LatLng(lat,lon))
                 .title("現在位置"));
-
-        mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
     public void SetSpaceMarker(double Lat,double Lon,String name) {
 

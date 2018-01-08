@@ -54,7 +54,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
     public GoogleMap mgooglemap;
     private GoolgeTool g;
-    public List<Address> addresses;
     ListView listView;
     ParkingAdapter parkingAdapter;
     JSONObject requestObj;
@@ -62,9 +61,9 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     private int markerflag = 0;
     private Marker marker;
     private Marker searchmarker;
-    ArrayList<Circle> circlearray ;
     Place plcaceset;
-
+    int countspace = 0 ;
+    TextView parkingnum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +73,15 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         g = getIntent().getParcelableExtra("goolgetool");
 
-        TextView parkingnum = (TextView)findViewById(R.id.ParkingNum);
+        parkingnum = (TextView)findViewById(R.id.ParkingNum);
         TextView addresstxt = (TextView)findViewById(R.id.Address);
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this,this)
+                .build();
 
         addresstxt.setText(g.getAddress());
         addresstxt.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +121,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         listView = (ListView) findViewById(R.id.ParkingList);
         parkingAdapter = new ParkingAdapter(this);
         SetJSONObject(g.getLat(),g.getLon());
-        parkingnum.setText("可停停車位:"+parkingAdapter.getYesPark()+" 個停車位");
         listView.setAdapter(parkingAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -133,13 +138,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this,this)
-                .build();
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -171,7 +169,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
                 .build();
         autocompleteFragment.setFilter(typeFilter);*/
-
 
     }
 
@@ -239,8 +236,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 Marker marker = mgooglemap.addMarker(new MarkerOptions()
                         .position(new LatLng(obj.getDouble("Lat"),obj.getDouble("Lon"))));
 
-                if (obj.getString("CellStatus").compareTo("Y")==0)
+                if (obj.getString("CellStatus").compareTo("Y")==0){
                     marker.setIcon(iconYes);
+                    countspace++;
+                }
                 else
                     marker.setIcon(iconNo);
         }
@@ -294,6 +293,8 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                             responseArr = response.getJSONArray("ParkingResult");
                             parkingAdapter.updateData(responseArr);
                             DrawCircle();
+                            parkingnum.setText("可停停車位:"+countspace+" 個停車位");
+                            countspace = 0;
                             Log.d("!!Success_1!!",response.toString());
                         }
                         catch (Exception e) {

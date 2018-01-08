@@ -34,21 +34,6 @@ public class ParkingAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(context);
         mJsonArray = new JSONArray();
     }
-    public String getYesPark(){
-
-        int count=0;
-        for(int i=0;i<getCount();i++)
-        {
-            JSONObject jsonObject = (JSONObject) getItem(i);
-            try {
-                if(jsonObject.getString("CellStatus").compareTo("Y")==0)
-                    count++;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return String.valueOf(count);
-    }
 
     @Override
     public int getCount() {

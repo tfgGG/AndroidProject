@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         ImageButton garbage = (ImageButton) MainActivity.this.findViewById(R.id.garbage);
         ImageButton setting = (ImageButton) MainActivity.this.findViewById(R.id.setting);
 
+
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -77,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             msg="沒有位置資訊 "+ e.getMessage().toString();
-        }goolgeTool.setAddress(msg);
+        }
+
+       goolgeTool.setAddress(msg);
 
         garbage.setOnClickListener(new ImageButton.OnClickListener(){
             @Override

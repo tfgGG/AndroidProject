@@ -1,9 +1,17 @@
 package com.example.jessicahuang.myapplication;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -60,10 +68,13 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
     GoogleApiClient mGoogleApiClient;
     private int markerflag = 0;
     private Marker marker;
-    private Marker searchmarker;
+    private Marker searchmarker,Nowmarker;
     Place plcaceset;
     int countspace = 0 ;
     TextView parkingnum;
+    TextView addresstxt;
+    LocationManager locationManager;
+    double lat,lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +83,10 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.content_parking);
 
         g = getIntent().getParcelableExtra("goolgetool");
-
+        lat = g.getLat();
+        lon = g.getLon();
         parkingnum = (TextView)findViewById(R.id.ParkingNum);
-        TextView addresstxt = (TextView)findViewById(R.id.Address);
+        addresstxt = (TextView)findViewById(R.id.Address);
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
@@ -89,7 +101,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View v) {
                 plcaceset  = null;
                 CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(g.getLat(), g.getLon()))      // Sets the center of the map to location user
+                        .target(new LatLng(lat, lon))      // Sets the center of the map to location user
                         .zoom(17)                   // Sets the zoom
                         .bearing(90)                // Sets the orientation of the camera to east
                         .tilt(40)                   // Sets the tilt of the camera to 30 degrees
@@ -146,7 +158,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onPlaceSelected(Place place) {
 
-                 plcaceset=place;
+                plcaceset=place;
                 String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
                 Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
                 toast.show();
@@ -158,7 +170,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
                 String messege = status.getStatusMessage();
                 Toast toast = Toast.makeText(ParkingActivity.this,messege, Toast.LENGTH_LONG);
                 toast.show();
@@ -169,29 +180,62 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
                 .build();
         autocompleteFragment.setFilter(typeFilter);*/
+        // first check for permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationListener listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                lat = location.getLatitude();
+                lon = location.getLongitude();
+                SetJSONObject(lat,lon);
+                addresstxt.setText(" "+lat + " " + lon);
+                Nowmarker.remove();
+                AddNowMarker(lat,lon);
+            }
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+            @Override
+            public void onProviderDisabled(String provider) {
+                Toast toast = Toast.makeText(ParkingActivity.this,"無法更新位置", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        };
+        // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
+        locationManager.requestLocationUpdates("gps", 2000, 0, listener);
 
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
-
         mgooglemap = map;
         //TODO:Get map road and detail
         mgooglemap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
+        AddNowMarker(g.getLat(), g.getLon());
+    }
+    public void AddNowMarker(double lat,double lon){
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(g.getLat(), g.getLon()))      // Sets the center of the map to location user
+                .target(new LatLng(lat,lon))      // Sets the center of the map to location user
                 .zoom(17)                   // Sets the zoom
                 .bearing(90)                // Sets the orientation of the camera to east
                 .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                 .build();
 
-        mgooglemap.addMarker(new MarkerOptions()
-                .position(new LatLng(g.getLat(),g.getLon()))
+        Nowmarker = mgooglemap.addMarker(new MarkerOptions()
+                .position(new LatLng(lat,lon))
                 .title("現在位置"));
 
         mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
     public void SetSpaceMarker(double Lat,double Lon,String name) {
 

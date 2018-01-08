@@ -11,11 +11,11 @@
         android:id="@+id/GarbageName"
         android:layout_width="207dp"
         android:layout_height="26dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="72dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="69dp"
         android:layout_marginStart="72dp"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -30,29 +30,11 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="280dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.984"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         android:layout_marginStart="280dp"
-        android:layout_marginEnd="8dp" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        app:srcCompat="@drawable/map"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.023"
-        app:layout_constraintVertical_bias="0.935"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
     <ImageView
@@ -69,51 +51,9 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.024"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.97"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
-
-    <TextView
-        android:id="@+id/Address"
-        android:layout_width="204dp"
-        android:layout_height="32dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="現 在 位 置"
-        android:textSize="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.932"
-        app:layout_constraintHorizontal_bias="0.39"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
-
-    <ScrollView
-        android:layout_width="357dp"
-        android:layout_height="256dp"
-        android:layout_marginBottom="104dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <ListView
-                android:id="@+id/GarbageDetailList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
-    </ScrollView>
 
     <fragment
         android:id="@+id/map"
@@ -132,6 +72,29 @@
         app:layout_constraintVertical_bias="0.02"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
+
+    <ScrollView
+        android:layout_width="371dp"
+        android:layout_height="306dp"
+        android:layout_marginBottom="72dp"
+        android:layout_marginLeft="7dp"
+        android:layout_marginStart="8dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/GarbageDetailList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+    </ScrollView>
 
 
 </android.support.constraint.ConstraintLayout>

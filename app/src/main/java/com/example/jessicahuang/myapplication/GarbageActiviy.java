@@ -65,10 +65,8 @@ public class GarbageActiviy extends AppCompatActivity implements GoogleApiClient
             public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 
                 JSONObject obj = (JSONObject)adapter.getItemAtPosition(position);
-
-                Toast toast = Toast.makeText(GarbageActiviy.this,obj.toString(), Toast.LENGTH_LONG);
-                toast.show();
-
+                //Toast toast = Toast.makeText(GarbageActiviy.this,obj.toString(), Toast.LENGTH_LONG);
+                //toast.show();
                 Intent intent = new Intent( GarbageActiviy.this,GarbageDetailActiviy.class);
                 try {
                     intent.putExtra("Id", obj.getString("LineId"));

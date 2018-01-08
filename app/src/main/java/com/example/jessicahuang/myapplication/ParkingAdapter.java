@@ -1,6 +1,8 @@
 package com.example.jessicahuang.myapplication;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,41 +54,39 @@ public class ParkingAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        try {
 
-        // 檢查view是否已存在，如果已存在就不用再取一次id
-        if (convertView == null) {
-            // Inflate the custom row layout from your XML.
-            convertView = mInflater.inflate(R.layout.parking_list, parent, false);
-            holder = new ViewHolder();
-            holder.ImageView = (ImageView) convertView.findViewById(R.id.imageView);
-            holder.AddressText = (TextView) convertView.findViewById(R.id.Name);
-            holder.PayText = (TextView) convertView.findViewById(R.id.PayText);
-            // hang onto this holder for future recyclage
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+            ViewHolder holder;
+            JSONObject jsonObject = (JSONObject) getItem(position);
+            // 檢查view是否已存在，如果已存在就不用再取一次id
+            if (convertView == null) {
+                // Inflate the custom row layout from your XML.
+                convertView = mInflater.inflate(R.layout.parking_list, parent, false);
+                holder = new ViewHolder();
+                holder.ImageView = (ImageView) convertView.findViewById(R.id.imageView);
+                holder.AddressText = (TextView) convertView.findViewById(R.id.Name);
+                holder.PayText = (TextView) convertView.findViewById(R.id.PayText);
+                // hang onto this holder for future recyclage
+                convertView.setTag(holder);
 
-        JSONObject jsonObject = (JSONObject) getItem(position);
-        try{
-            String name =  jsonObject.getString("Name");
-            if(name.compareTo("汽車停車位")==0)
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            String name = jsonObject.getString("Name");
+            if (jsonObject.getString("CellStatus").compareTo("N")==0)
                 holder.ImageView.setImageResource(R.mipmap.ic_launcher);
             else
                 holder.ImageView.setImageResource(R.mipmap.ic_launcher_round);
 
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        try {
             holder.PayText.setText(jsonObject.getString("PayCash"));
-            holder.AddressText.setText(jsonObject.getString("Name")+jsonObject.getString("Distance"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            holder.AddressText.setText( jsonObject.getString("Name") + "  距離:"+jsonObject.getInt("Distance"));
+        }
+        catch (Exception e ){
+                e.printStackTrace();
         }
 
         return  convertView;
     }
+
 }

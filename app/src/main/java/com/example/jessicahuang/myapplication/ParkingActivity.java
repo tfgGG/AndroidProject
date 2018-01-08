@@ -3,6 +3,7 @@ package com.example.jessicahuang.myapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -108,7 +109,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                         .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                         .build();
                 mgooglemap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                SetJSONObject(g.getLat(),g.getLon());
+                SetJSONObject(lat,lon);
             }
         });
 
@@ -119,13 +120,13 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 finish();
             }
         });
-        ImageButton refresh = (ImageButton)findViewById(R.id.refresh);
+        /*ImageButton refresh = (ImageButton)findViewById(R.id.refresh);
         refresh.setOnClickListener(new ImageButton.OnClickListener(){
             @Override
             public void onClick(View v) {
                 RefreshData();
             }
-        });
+        });*/
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
@@ -133,7 +134,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         listView = (ListView) findViewById(R.id.ParkingList);
         parkingAdapter = new ParkingAdapter(this);
-        SetJSONObject(g.getLat(),g.getLon());
+        SetJSONObject(lat,lon);
         listView.setAdapter(parkingAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -142,11 +143,12 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 JSONObject obj = (JSONObject)adapter.getItemAtPosition(position);
                 try {
                     SetSpaceMarker(obj.getDouble("Lat"),obj.getDouble("Lon"),obj.getString("Name"));
+                   // Toast toast = Toast.makeText(ParkingActivity.this,obj.getString("Id")+"  "+obj.getString("CellStatus")+" "+position, Toast.LENGTH_SHORT);
+                    //toast.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Toast toast = Toast.makeText(ParkingActivity.this,obj.toString(), Toast.LENGTH_LONG);
-                toast.show();
+
 
             }
         });
@@ -161,14 +163,13 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
                 plcaceset=place;
                 String messege = place.getName() + "地址" + place.getAddress()+ place.getLatLng();
-                Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
-                toast.show();
+                //Toast toast = Toast.makeText(ParkingActivity.this,messege,Toast.LENGTH_LONG);
+                //toast.show();
                 markerflag = 2;
                 SetJSONObject(place.getLatLng().latitude,place.getLatLng().longitude);
                 SetSpaceMarker(place.getLatLng().latitude,place.getLatLng().longitude,place.getName().toString());
                 Log.i("Success", "Place: " + place.getName());
             }
-
             @Override
             public void onError(Status status) {
                 String messege = status.getStatusMessage();
@@ -177,11 +178,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 Log.i("Failed", "An error occurred: " + status);
             }
         });
-       /* AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_GEOCODE)
-                .build();
-        autocompleteFragment.setFilter(typeFilter);*/
-        // first check for permissions
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
@@ -196,7 +193,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             public void onLocationChanged(Location location) {
                 lat = location.getLatitude();
                 lon = location.getLongitude();
-                SetJSONObject(lat,lon);
                 getNowAdress();
                 AddNowMarker(lat,lon);
             }
@@ -213,7 +209,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             }
         };
         // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        locationManager.requestLocationUpdates("gps", 3000, 0, listener);
+        locationManager.requestLocationUpdates("gps", 6000, 0, listener);
 
     }
     public void getNowAdress() {
@@ -292,7 +288,6 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
             for (int i=0;i<parkingAdapter.getCount();i++)
             {
                 obj = (JSONObject) parkingAdapter.getItem(i);
-                String status = obj.getString("CellStatus");
 
                 Marker marker = mgooglemap.addMarker(new MarkerOptions()
                         .position(new LatLng(obj.getDouble("Lat"),obj.getDouble("Lon"))));
@@ -307,34 +302,9 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
         }catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.d("!!Success_1!!","MyCheck DrawCircle");
     }
-/*
-    public void RefreshData(){
 
-        String url = "http://140.136.148.203/Android_PHP/UpdateParkingStatus.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        String  Ans= response;
-                        Toast toast = Toast.makeText(ParkingActivity.this, "Success.....", Toast.LENGTH_LONG);
-                        toast.show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast toast = Toast.makeText(ParkingActivity.this, "Error.....", Toast.LENGTH_LONG);
-                toast.show();
-            }
-        });
-        QueueSingleton.getInstance(this).addToRequestQueue(stringRequest);
-        Toast toast = Toast.makeText(ParkingActivity.this, "sdrgawergawergawer", Toast.LENGTH_LONG);
-        toast.show();
-        if(plcaceset == null)
-            SetJSONObject(g.getLat(),g.getLon());
-        else
-            SetJSONObject(plcaceset.getLatLng().latitude,plcaceset.getLatLng().longitude);
-    }*/
 
     public  void SetJSONObject(Double Lat,Double Lon){
         String url = "http://140.136.148.203/Android_PHP/ReturnParkingSpace.php";
@@ -356,7 +326,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                             DrawCircle();
                             parkingnum.setText("可停停車位:"+countspace+" 個停車位");
                             countspace = 0;
-                            Log.d("!!Success_1!!",response.toString());
+                            Log.d("!!Success_1!!","MyCheck"+response.toString());
                         }
                         catch (Exception e) {
                             Log.d("!!Fail_1!!!",e.getMessage().toString());
@@ -370,6 +340,7 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
                 });
 
         QueueSingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        Log.d("!!Sucess!!","MyCheck Finish getData");
         //return  Ans;
 
     }
@@ -387,5 +358,4 @@ public class ParkingActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     }
-
 }

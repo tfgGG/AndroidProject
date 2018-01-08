@@ -110,8 +110,8 @@ public class GarbageDetailActiviy extends AppCompatActivity implements OnMapRead
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Toast toast = Toast.makeText(GarbageDetailActiviy.this,obj.toString(), Toast.LENGTH_LONG);
-                toast.show();
+                //Toast toast = Toast.makeText(GarbageDetailActiviy.this,obj.toString(), Toast.LENGTH_LONG);
+                //toast.show();
             }
         });
 
